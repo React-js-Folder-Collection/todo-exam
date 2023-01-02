@@ -1,28 +1,29 @@
-import React, { useContext } from 'react';
-import { TodoContext } from './TodoContext';
-export default function CheckUncheckAll() {
-  const {todos,setTodos,check,setCheck} = useContext(TodoContext);  
+import React, { useState } from 'react';
+import { useDispatch,useSelector } from "react-redux";
+import {todocheckAll, todoUncheckAll} from "../redux/tasksSlice";
+export default function CheckUncheckAll(props) {
+// const [check, setCheck] = useState(true);
+const dispatch = useDispatch();
+const todos = useSelector((state)=>{
+  return state.todos;
+});
 function checkAll(){
-  const checkAll = todos.map(todo=>{
-      todo.isComplete = true;
-      return todo;
-    })
-  setTodos(checkAll);
-  setCheck(false);
+  dispatch(
+    todocheckAll()
+  )
+  props.setCheck(false);
 }
 function uncheckAll(){
-  const checkAll = todos.map(todo=>{
-    todo.isComplete = false;
-    return todo;
-  })
-setTodos(checkAll);
-setCheck(true);
+  dispatch(
+    todoUncheckAll()
+  )
+  props.setCheck(true);
 }
   return (
     <>
     {todos.length > 0 ? (
-    <button  type="button" className="btn btn-outline-primary tw-mr-5" onClick={check ? checkAll : uncheckAll }>
-      {check ? 'check All' : 'UnCheck All'}
+    <button  type="button" className="btn btn-outline-primary tw-mr-5" onClick={props.check ? checkAll : uncheckAll }>
+      {props.check ? 'check All' : 'UnCheck All'}
     </button>) : ''
     }
     </>

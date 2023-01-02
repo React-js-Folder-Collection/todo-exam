@@ -1,70 +1,72 @@
-import React, { useContext } from 'react';
+import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderOpen} from '@fortawesome/free-solid-svg-icons'
-import { TodoContext} from './TodoContext';
+import { useDispatch,useSelector } from "react-redux";
+import {todoinputChange , checkTask ,deleteTask, updateTodo, tododeleteEscapeItem} from "../redux/tasksSlice";
 
-export default function TodoList() {
-const {setCheck,todos,setTodos,currentPosts} = useContext(TodoContext);
+export default function TodoList(props) {
+const dispatch = useDispatch();
+const todos = useSelector((state)=>{
+  return state.todos;
+});
+// const todos = localStorage.getItem('todos');
+// useEffect(() => {
+//   localStorage.setItem('todos', JSON.stringify(todos));
+//   }, ['todos', todos]);
 
 function checkItem(id){
-  const checkItem = todos.map(todo=>{
+  todos.map(todo=>{
     if(todo.id == id){
-      todo.isComplete = !todo.isComplete;
+      dispatch(
+        checkTask({
+          id: todo.id
+        })
+      )
     }
-    if(todo.isComplete == true){
-      setCheck(false);
+    if(todo.isComplete === true){
+      props.setCheck(false);
     }else{
-      setCheck(true);
-    }
-    return todo;
-  })
-  setTodos(checkItem);
-}
-function inputChange(id){
-  const item = todos.map(todo=>{
-    if(todo.id == id){
-      todo.isEditing = true;
-    }
-    return todo;
-  })
-  setTodos(item);
-}
-function updateItem(event, id){
-  event.preventDefault();
-  const item = todos.map(todo=>{
-
-    if(todo.id == id){
-      if(event.target.value == ''){
-        todo.isEditing = false;
-        return todo;
-      }
-      todo.title = event.target.value;
-      todo.isEditing = false;
-    }
-    return todo;
-  })
-  setTodos(item);
-}
-function deleteEscapeItem(event, id){
-  event.preventDefault();
-  const item = todos.map(todo=>{
-    if(todo.id == id){
-      todo.isEditing = false;
-    }
-    return todo;
-  })
-  setTodos(item);
+      props.setCheck(true);
+    }  
+})
 }
 function deleteItem(event,id){
   event.preventDefault();
-  const deleteItem = [...todos].filter(todo => todo.id != id);
-  setTodos(deleteItem);
+  dispatch(
+    deleteTask({
+      id: id
+    })
+  )
+}
+function inputChange(id){
+  dispatch(
+    todoinputChange({
+      id: id
+    })
+  )
+}
+function updateItem(event, id){
+  event.preventDefault();
+  dispatch(
+    updateTodo({
+      id: id,
+      event : event.target.value
+    })
+  )
+}
+function deleteEscapeItem(event, id){
+  event.preventDefault();
+  dispatch(
+    tododeleteEscapeItem({
+      id: id,
+    })
+  )
 }
 return (
   todos.filter(todo => todo).length>0 ?(
-  <ul className="list-group my-3">     
+  <ul className="list-group my-3">
       {
-      currentPosts.reverse().map((todo,index)=>(
+      props.currentPosts.map((todo,index)=>(
         <li key={index} className={`${todo.isComplete ? 'opacity-50 list-group-item' : 'list-group-item' }`}>
           <div>
             <input className='form-check-input tw-mr-2'
@@ -72,7 +74,7 @@ return (
                   onChange={() => checkItem(todo.id)}
                   checked={todo.isComplete ? true : false}
                 />
-            {!todo.isEditing ? (
+              {!todo.isEditing ? (
                         <span onDoubleClick={() => inputChange(todo.id)}
                         className={`${
                           todo.isComplete ? 'text-decoration-line-through' : ''
@@ -95,7 +97,7 @@ return (
                         />
                     )
             }
-            <button className='float-end border-0 bg-white' onClick={event => {if(window.confirm('Are you sure to delete this todo item?')){deleteItem(event,todo.id)}}}>X</button>
+              <button className='float-end border-0 bg-white' onClick={event => {if(window.confirm('Are you sure to delete this todo item?')){deleteItem(event,todo.id)}}}>X</button>
           </div>
         </li>
       ))}

@@ -1,60 +1,45 @@
-import {useEffect, useRef, useState } from 'react';
-import '../App.css';
+import TodoForm from "./TodoForm";
 import TodoList from './TodoList';
+import TodoRemaining from './TodoRemaining';
 import CheckUncheckAll from './CheckUncheckAll';
 import ClearAll from './ClearAll';
-import TodoRemaining from './TodoRemaining';
 import Pagination from './Pagination';
-import TodoForm from './TodoForm';
-import {TodoContext} from './TodoContext';
-import { useLocalStorage } from './useLocalStorage';
+import '../App.css';
+import {useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+// import { useLocalStorage } from './useLocalStorage';
 function App() {
-const [input, setInput] = useState("");
-const [check, setCheck] = useState(true);
-const [todos, setTodos] = useLocalStorage('todos',[]);
-const focus = useRef(null);
+const todos = useSelector((state)=>{
+  return state.todos;
+});
+// useEffect(() => {
+//   localStorage.setItem('todos', JSON.stringify(todos));
+//   }, ['todos', todos]);
 const [currentPage, paginate] = useState(1);
 const postsPerPage = 5;
 const indexOfLastPost = currentPage * postsPerPage;
 const indexOfFirstPost = indexOfLastPost - postsPerPage;
 const currentPosts = todos.slice(indexOfFirstPost, indexOfLastPost);
-useEffect(() => {
-  focus.current.focus();
-}, []);
+const [check, setCheck] = useState(true);
+// const [todos, setTodos] = useLocalStorage('todos',[]);
   return (
-    <TodoContext.Provider
-    value={{ 
-      input,
-      setInput,
-      check,
-      setCheck,
-      todos,
-      setTodos,
-      focus,
-      currentPage, 
-      paginate,
-      postsPerPage,
-      currentPosts,
-     }}    
-    >
-      <div className='container w-50 bg-light p-3 mt-5 border rounded'>
+     <div className='container w-50 bg-light p-3 mt-5 border rounded'>
         <div>
-        <h1 className='mt-2 text-center tw-text-5xl'>
-          Todo List
-        </h1>
-        <TodoForm/>
-        <TodoList/>
-        <Pagination/>
-        <br />
-        <TodoRemaining/>
-        <div className='mt-3'>
-        <CheckUncheckAll/>
-        <ClearAll/>
-        </div>
+          <h1 className='mt-2 text-center tw-text-5xl'>
+            Todo List
+          </h1>
+          <TodoForm/>
+          <TodoList currentPosts={currentPosts} check={check} setCheck={setCheck}/>
+          <Pagination currentPage={currentPage} paginate={paginate} postsPerPage={postsPerPage}/>
+          <br />
+          <TodoRemaining/>
+          <div className='mt-3'>
+            <CheckUncheckAll check={check} setCheck={setCheck}/>
+            <ClearAll/>
+          </div>
         </div>
       </div>
-    </TodoContext.Provider>
-  );
+  )
 }
 
 export default App;

@@ -1,10 +1,15 @@
-import React, { useContext } from 'react';
-import { TodoContext } from './TodoContext'
-export default function ClearAll() {
-  const {todos,setTodos} = useContext(TodoContext);  
+import React from 'react';
+import { useDispatch,useSelector } from "react-redux";
+import {todoClearAll} from "../redux/tasksSlice";
+export default function ClearAll() {  
+const dispatch = useDispatch();
+const todos = useSelector((state)=>{
+  return state.todos;
+});
 function clearAll(){
-  const clearAll = [...todos].filter(todo => todo.isComplete != true);
-  setTodos(clearAll);
+  dispatch(
+    todoClearAll()
+  )
 }
   return (
     <>

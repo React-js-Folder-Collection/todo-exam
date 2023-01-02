@@ -1,7 +1,9 @@
-import React, { useContext } from 'react';
-import { TodoContext } from './TodoContext'
+import React from 'react';
+import {useSelector } from "react-redux";
 export default function TodoRemaining() {
-  const {todos} = useContext(TodoContext);
+  const todos = useSelector((state)=>{
+    return state.todos;
+  });
   return (
     <div className='text-center'>
     <hr />
